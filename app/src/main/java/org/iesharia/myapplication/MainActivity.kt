@@ -142,12 +142,12 @@ fun MainActivity(modifier: Modifier) {
                         val cursor = db.getName()
 
                         cursor!!.moveToFirst()
-                        lName += "\n" + cursor.getString(cursor.getColumnIndex(DBHelper.NAME_COl))
-                        lAge += "\n" + cursor.getString(cursor.getColumnIndex(DBHelper.AGE_COL))
+                        lName.add("\n" + cursor.getString(cursor.getColumnIndex(DBHelper.NAME_COl)))
+                        lAge.add("\n" + cursor.getString(cursor.getColumnIndex(DBHelper.AGE_COL)))
 
                         while(cursor.moveToNext()){
-                            lName += "\n" + cursor.getString(cursor.getColumnIndex(DBHelper.NAME_COl))
-                            lAge += "\n" + cursor.getString(cursor.getColumnIndex(DBHelper.AGE_COL))
+                            lName.add("\n" + cursor.getString(cursor.getColumnIndex(DBHelper.NAME_COl)))
+                            lAge.add("\n" + cursor.getString(cursor.getColumnIndex(DBHelper.AGE_COL)))
                         }
 
                         cursor.close()
@@ -161,29 +161,32 @@ fun MainActivity(modifier: Modifier) {
         }
         var mostrarBorrar by remember { mutableStateOf(false) }
         for (i in lName.indices) {
-            var indice:Int = i
             Row {
                 ClickableText(
-                    text = AnnotatedString(lName[indice]) ,
+                    text = AnnotatedString(lName[i]) ,
                     onClick = {
                         mostrarBorrar = true
 
                     },
                     modifier = bModifier
                 )
-//            Text(
-//                modifier = bModifier,
-//                text = lName
-//            )
                 Text(
                     modifier = bModifier,
-                    text = lAge[indice]
+                    text = lAge[i]
                 )
                 if (mostrarBorrar) {
                     Button(
                         modifier = bModifier,
                         onClick = {
-                            Log.i("ejemplo", "hola")
+                            val wasDeleted = db.deleteName(lName[i], lAge[i])
+
+                            if (wasDeleted) {
+                                // Si la eliminación fue exitosa, eliminar de las listas y actualizar la UI
+                                lName.removeAt(i)
+                                lAge.removeAt(i)
+                                mostrarBorrar = false // Ocultar el botón de borrar
+                                Toast.makeText(context, "Registro eliminado", Toast.LENGTH_SHORT).show()
+                            }
                         },
                     ) {
                         Text(
@@ -192,7 +195,6 @@ fun MainActivity(modifier: Modifier) {
                     }
                 }
             }
-//            indice += 1
         }
 
 
