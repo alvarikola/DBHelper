@@ -67,6 +67,7 @@ fun MainActivity(modifier: Modifier) {
 
     var lName:MutableList<String> = remember { mutableListOf<String>("Nombre") }
     var lAge:MutableList<String> = remember { mutableListOf<String>("Edad") }
+    var lId:MutableList<String> = remember { mutableListOf<String>() }
 
     Column (
         verticalArrangement = Arrangement.Center,
