@@ -1,8 +1,7 @@
 package org.iesharia.myapplication
 
-import android.database.sqlite.SQLiteDatabase
+import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,15 +9,18 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,6 +35,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.iesharia.myapplication.data.DBHelper
 import org.iesharia.myapplication.ui.theme.MyApplicationTheme
 
 
@@ -46,8 +49,8 @@ class MainActivity : ComponentActivity() {
             MyApplicationTheme {
                 Scaffold(
                     modifier = Modifier
-                    .fillMaxSize()
-                    .padding(10.dp)
+                        .fillMaxSize()
+                        .padding(10.dp)
                 ) { innerPadding ->
                     MainActivity (
                         modifier = Modifier
@@ -60,14 +63,19 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@SuppressLint("Range")
 @Composable
 fun MainActivity(modifier: Modifier) {
     val context = LocalContext.current
     val db = DBHelper(context)
 
-    var lName:MutableList<String> = remember { mutableListOf<String>("Nombre") }
-    var lAge:MutableList<String> = remember { mutableListOf<String>("Edad") }
+    var lName:MutableList<String> = remember { mutableListOf<String>() }
+    var lAge:MutableList<String> = remember { mutableListOf<String>() }
     var lId:MutableList<String> = remember { mutableListOf<String>() }
+    var mostrarBorrar by remember { mutableStateOf(false) }
+    var mostrarEditar by remember { mutableStateOf(false) }
+    var mostrarDialogo by remember { mutableStateOf(false) }
+
 
     Column (
         verticalArrangement = Arrangement.Center,
@@ -116,7 +124,6 @@ fun MainActivity(modifier: Modifier) {
                 modifier = bModifier,
                 onClick = {
 
-
                     val name = nameValue
                     val age = ageValue
 
@@ -138,6 +145,10 @@ fun MainActivity(modifier: Modifier) {
                 modifier = bModifier,
                 onClick = {
                     try {
+                        lId.clear()
+                        lName.clear()
+                        lAge.clear()
+
                         val db = DBHelper(context, null)
 
                         val cursor = db.getName()
@@ -155,23 +166,36 @@ fun MainActivity(modifier: Modifier) {
 
                         }
 
-                        cursor.close()
+                        cursor?.close()
                     } catch (e: Exception){
                         e.printStackTrace()
-                }
+                    }
                 }
             ) {
                 Text(text = "Mostrar")
             }
         }
-        var mostrarBorrar by remember { mutableStateOf(false) }
+        Column {
+            Row (
+
+            ){
+                Text(
+                    text = "Nombre"
+                )
+                Spacer(modifier = Modifier.padding(15.dp))
+                Text(
+                    text = "Edad"
+                )
+            }
+        }
+
         for (i in lName.indices) {
             Row {
                 ClickableText(
                     text = AnnotatedString(lName[i]) ,
                     onClick = {
                         mostrarBorrar = true
-
+                        mostrarEditar = true
                     },
                     modifier = bModifier
                 )
@@ -186,10 +210,10 @@ fun MainActivity(modifier: Modifier) {
                             val wasDeleted = db.deleteName(lId[i])
 
                             if (wasDeleted) {
-                                // Si la eliminación fue exitosa, eliminar de las listas y actualizar la UI
                                 lName.removeAt(i)
                                 lAge.removeAt(i)
                                 mostrarBorrar = false // Ocultar el botón de borrar
+                                mostrarEditar = false // Ocultar el botón de editar
                                 Toast.makeText(context, "Registro eliminado", Toast.LENGTH_SHORT).show()
                             }
                         },
@@ -198,6 +222,71 @@ fun MainActivity(modifier: Modifier) {
                             text = "Borrar"
                         )
                     }
+                }
+                if (mostrarEditar) {
+                    Button(
+
+                        modifier = bModifier,
+                        onClick = {
+                            mostrarDialogo = true
+                            mostrarBorrar = false // Ocultar el botón de borrar
+                            mostrarEditar = false // Ocultar el botón de editar
+                        },
+                    ) {
+                        Text(
+                            text = "Editar"
+                        )
+                    }
+                }
+                if (mostrarDialogo) {
+                    AlertDialog(
+                        onDismissRequest = { mostrarDialogo = false },
+                        title = { Text(text = "Actualizar") },
+                        text = {
+                            Column (
+                                verticalArrangement = Arrangement.Center,
+                                modifier = modifier,
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                //Nombre
+                                var nameValue by remember { mutableStateOf("") }
+                                OutlinedTextField(
+                                    value = nameValue,
+                                    onValueChange = {
+                                        nameValue = it
+                                    },
+                                    modifier = Modifier,
+                                    textStyle = TextStyle(color = Color.DarkGray),
+                                    label = { Text(text = "Nombre") },
+                                    singleLine = true,
+                                    shape = RoundedCornerShape(10.dp)
+                                )
+                                //Edad
+                                var ageValue by remember { mutableStateOf("") }
+                                OutlinedTextField(
+                                    value = ageValue,
+                                    onValueChange = {
+                                        ageValue = it
+                                    },
+                                    modifier = Modifier,
+                                    textStyle = TextStyle(color = Color.DarkGray),
+                                    label = { Text(text = "Edad") },
+                                    singleLine = true,
+                                    shape = RoundedCornerShape(10.dp)
+                                )
+                            }
+                        },
+                        confirmButton = {
+                            TextButton(onClick = onConfirm) {
+                                Text("Sí")
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = onCancel) {
+                                Text("No")
+                            }
+                        }
+                    )
                 }
             }
         }
