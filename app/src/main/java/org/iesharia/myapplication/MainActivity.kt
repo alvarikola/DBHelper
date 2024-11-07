@@ -143,12 +143,16 @@ fun MainActivity(modifier: Modifier) {
                         val cursor = db.getName()
 
                         cursor!!.moveToFirst()
-                        lName.add("\n" + cursor.getString(cursor.getColumnIndex(DBHelper.NAME_COl)))
-                        lAge.add("\n" + cursor.getString(cursor.getColumnIndex(DBHelper.AGE_COL)))
+                        lName.add(cursor.getString(cursor.getColumnIndex(DBHelper.NAME_COl)))
+                        lAge.add(cursor.getString(cursor.getColumnIndex(DBHelper.AGE_COL)))
+                        lId.add(cursor.getString(cursor.getColumnIndex(DBHelper.ID_COL)))
+
 
                         while(cursor.moveToNext()){
-                            lName.add("\n" + cursor.getString(cursor.getColumnIndex(DBHelper.NAME_COl)))
-                            lAge.add("\n" + cursor.getString(cursor.getColumnIndex(DBHelper.AGE_COL)))
+                            lName.add(cursor.getString(cursor.getColumnIndex(DBHelper.NAME_COl)))
+                            lAge.add(cursor.getString(cursor.getColumnIndex(DBHelper.AGE_COL)))
+                            lId.add(cursor.getString(cursor.getColumnIndex(DBHelper.ID_COL)))
+
                         }
 
                         cursor.close()
@@ -179,7 +183,7 @@ fun MainActivity(modifier: Modifier) {
                     Button(
                         modifier = bModifier,
                         onClick = {
-                            val wasDeleted = db.deleteName(lName[i], lAge[i])
+                            val wasDeleted = db.deleteName(lId[i])
 
                             if (wasDeleted) {
                                 // Si la eliminación fue exitosa, eliminar de las listas y actualizar la UI
