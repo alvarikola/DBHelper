@@ -1,4 +1,4 @@
-package org.iesharia.myapplication
+package org.iesharia.myapplication.data
 
 import android.content.ContentValues
 import android.content.Context
@@ -50,17 +50,32 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory? = null) 
     fun deleteName(id: String): Boolean {
         val db = this.writableDatabase
 
-        // Establecemos la condición para eliminar el registro
+        // Condición para eliminar el registro
         val whereClause = "$ID_COL = ?"
         val whereArgs = arrayOf(id)
 
-        // Ejecutamos el DELETE en la base de datos
+        // Ejecuta el DELETE en la base de datos
         val rowsDeleted = db.delete(TABLE_NAME, whereClause, whereArgs)
 
         db.close()
 
-        // Retornamos true si se eliminó al menos una fila
+        // Devuelve true si se eliminó al menos una fila
         return rowsDeleted > 0
+    }
+
+    fun updateName(id: String, name: String, age: String): Int{
+        val db = this.writableDatabase
+
+        val values = ContentValues()
+
+        values.put(NAME_COl, name)
+        values.put(AGE_COL, age)
+
+        val whereClause = "$ID_COL = ?"
+        val whereArgs = arrayOf(id)
+
+        return db.update(TABLE_NAME, values, whereClause, whereArgs)
+
     }
 
     companion object{
