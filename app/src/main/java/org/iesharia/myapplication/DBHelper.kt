@@ -47,12 +47,12 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory? = null) 
         return db.rawQuery("SELECT * FROM " + TABLE_NAME, null)
     }
 
-    fun deleteName(nombre: String, edad: String): Boolean {
+    fun deleteName(id: String): Boolean {
         val db = this.writableDatabase
 
         // Establecemos la condición para eliminar el registro
-        val whereClause = "$NAME_COl = ? AND $AGE_COL = ?"
-        val whereArgs = arrayOf(nombre, edad)
+        val whereClause = "$ID_COL = ?"
+        val whereArgs = arrayOf(id)
 
         // Ejecutamos el DELETE en la base de datos
         val rowsDeleted = db.delete(TABLE_NAME, whereClause, whereArgs)
