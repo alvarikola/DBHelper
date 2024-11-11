@@ -2,6 +2,7 @@ package org.iesharia.myapplication
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -67,7 +68,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainActivity(modifier: Modifier) {
     val context = LocalContext.current
-    val db = DBHelper(context)
+    val db by remember { mutableStateOf(DBHelper(context)) }
 
     var lName:MutableList<String> = remember { mutableListOf<String>() }
     var lAge:MutableList<String> = remember { mutableListOf<String>() }
@@ -207,9 +208,9 @@ fun MainActivity(modifier: Modifier) {
                     Button(
                         modifier = bModifier,
                         onClick = {
-                            val wasDeleted = db.deleteName(lId[i])
+                            val fueBorrado = db.deleteName(lId[i])
 
-                            if (wasDeleted) {
+                            if (fueBorrado) {
                                 lName.removeAt(i)
                                 lAge.removeAt(i)
                                 mostrarBorrar = false // Ocultar el botón de borrar
@@ -239,6 +240,8 @@ fun MainActivity(modifier: Modifier) {
                     }
                 }
                 if (mostrarDialogo) {
+                    var nameValue by remember { mutableStateOf(lName[i]) }
+                    var ageValue by remember { mutableStateOf(lAge[i]) }
                     AlertDialog(
                         onDismissRequest = { mostrarDialogo = false },
                         title = { Text(text = "Actualizar") },
@@ -249,7 +252,6 @@ fun MainActivity(modifier: Modifier) {
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 //Nombre
-                                var nameValue by remember { mutableStateOf("") }
                                 OutlinedTextField(
                                     value = nameValue,
                                     onValueChange = {
@@ -262,7 +264,6 @@ fun MainActivity(modifier: Modifier) {
                                     shape = RoundedCornerShape(10.dp)
                                 )
                                 //Edad
-                                var ageValue by remember { mutableStateOf("") }
                                 OutlinedTextField(
                                     value = ageValue,
                                     onValueChange = {
@@ -277,13 +278,20 @@ fun MainActivity(modifier: Modifier) {
                             }
                         },
                         confirmButton = {
-                            TextButton(onClick = db.updateName(lId, nameValue, ageValue)) {
-                                Text("Sí")
+                            TextButton(onClick = {
+                                val fueActualizado = db.updateName(lId[i], nameValue, ageValue)
+                                if (fueActualizado) {
+                                    mostrarDialogo = false
+                                    Toast.makeText(context, "Registro actualizado", Toast.LENGTH_SHORT).show()
+                                    Log.i("prueba", nameValue)
+                                }
+                            }) {
+                                Text("Actualizar")
                             }
                         },
                         dismissButton = {
-                            TextButton(onClick = onCancel) {
-                                Text("No")
+                            TextButton(onClick = { mostrarDialogo = false }) {
+                                Text("Cancelar")
                             }
                         }
                     )
