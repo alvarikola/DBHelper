@@ -63,7 +63,7 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory? = null) 
         return rowsDeleted > 0
     }
 
-    fun updateName(id: String, name: String, age: String): Int{
+    fun updateName(id: String, name: String, age: String): Boolean{
         val db = this.writableDatabase
 
         val values = ContentValues()
@@ -74,8 +74,9 @@ class DBHelper(context: Context, factory: SQLiteDatabase.CursorFactory? = null) 
         val whereClause = "$ID_COL = ?"
         val whereArgs = arrayOf(id)
 
-        return db.update(TABLE_NAME, values, whereClause, whereArgs)
+        val rowsUpdate = db.update(TABLE_NAME, values, whereClause, whereArgs)
 
+        return rowsUpdate > 0
     }
 
     companion object{
