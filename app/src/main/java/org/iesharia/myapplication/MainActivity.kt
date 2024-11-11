@@ -277,7 +277,7 @@ fun MainActivity(modifier: Modifier) {
                             }
                         },
                         confirmButton = {
-                            TextButton(onClick = onConfirm) {
+                            TextButton(onClick = db.updateName(lId, nameValue, ageValue)) {
                                 Text("Sí")
                             }
                         },
