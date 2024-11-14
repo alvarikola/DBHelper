@@ -1,6 +1,7 @@
 package org.iesharia.myapplication
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -138,42 +139,10 @@ fun MainActivity(modifier: Modifier) {
 
                     nameValue = ""
                     ageValue = ""
+                    mostrar(lId, lName, lName, context)
                 }
             ) {
                 Text(text = "Añadir")
-            }
-            Button(
-                modifier = bModifier,
-                onClick = {
-                    try {
-                        lId.clear()
-                        lName.clear()
-                        lAge.clear()
-
-                        val db = DBHelper(context, null)
-
-                        val cursor = db.getName()
-
-                        cursor!!.moveToFirst()
-                        lName.add(cursor.getString(cursor.getColumnIndex(DBHelper.NAME_COl)))
-                        lAge.add(cursor.getString(cursor.getColumnIndex(DBHelper.AGE_COL)))
-                        lId.add(cursor.getString(cursor.getColumnIndex(DBHelper.ID_COL)))
-
-
-                        while(cursor.moveToNext()){
-                            lName.add(cursor.getString(cursor.getColumnIndex(DBHelper.NAME_COl)))
-                            lAge.add(cursor.getString(cursor.getColumnIndex(DBHelper.AGE_COL)))
-                            lId.add(cursor.getString(cursor.getColumnIndex(DBHelper.ID_COL)))
-
-                        }
-
-                        cursor?.close()
-                    } catch (e: Exception){
-                        e.printStackTrace()
-                    }
-                }
-            ) {
-                Text(text = "Mostrar")
             }
         }
         Column {
@@ -216,6 +185,7 @@ fun MainActivity(modifier: Modifier) {
                                 mostrarBorrar = false // Ocultar el botón de borrar
                                 mostrarEditar = false // Ocultar el botón de editar
                                 Toast.makeText(context, "Registro eliminado", Toast.LENGTH_SHORT).show()
+                                mostrar(lId, lName, lName, context)
                             }
                         },
                     ) {
@@ -284,6 +254,7 @@ fun MainActivity(modifier: Modifier) {
                                     mostrarDialogo = false
                                     Toast.makeText(context, "Registro actualizado", Toast.LENGTH_SHORT).show()
                                     Log.i("prueba", nameValue)
+                                    mostrar(lId, lName, lName, context)
                                 }
                             }) {
                                 Text("Actualizar")
@@ -300,5 +271,35 @@ fun MainActivity(modifier: Modifier) {
         }
 
 
+    }
+}
+
+@SuppressLint("Range")
+fun mostrar(lId: MutableList<String>, lName: MutableList<String>, lAge: MutableList<String>, context: Context) {
+    try {
+        lId.clear()
+        lName.clear()
+        lAge.clear()
+
+        val db = DBHelper(context, null)
+
+        val cursor = db.getName()
+
+        cursor!!.moveToFirst()
+        lName.add(cursor.getString(cursor.getColumnIndex(DBHelper.NAME_COl)))
+        lAge.add(cursor.getString(cursor.getColumnIndex(DBHelper.AGE_COL)))
+        lId.add(cursor.getString(cursor.getColumnIndex(DBHelper.ID_COL)))
+
+
+        while(cursor.moveToNext()){
+            lName.add(cursor.getString(cursor.getColumnIndex(DBHelper.NAME_COl)))
+            lAge.add(cursor.getString(cursor.getColumnIndex(DBHelper.AGE_COL)))
+            lId.add(cursor.getString(cursor.getColumnIndex(DBHelper.ID_COL)))
+
+        }
+
+        cursor?.close()
+    } catch (e: Exception){
+        e.printStackTrace()
     }
 }
