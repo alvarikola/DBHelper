@@ -66,13 +66,15 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-
-
-//@SuppressLint("Range")
+@SuppressLint("Range")
 @Composable
+
 fun MainActivity(modifier: Modifier) {
+
+
     val context = LocalContext.current
     val db by remember { mutableStateOf(DBHelper(context)) }
+//    val cursor by remember { mutableStateOf(db.getName()) }
 
     var lName:MutableList<String> = remember { mutableListOf<String>() }
     var lAge:MutableList<String> = remember { mutableListOf<String>() }
@@ -81,9 +83,38 @@ fun MainActivity(modifier: Modifier) {
     var mostrarEditar by remember { mutableStateOf(false) }
     var mostrarDialogo by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        mostrar(lId, lName, lName, context)
+
+    @SuppressLint("Range")
+    fun mostrar() {
+        try {
+            lId.clear()
+            lName.clear()
+            lAge.clear()
+
+            val db = DBHelper(context, null)
+
+            val cursor = db.getName()
+
+            cursor!!.moveToFirst()
+            lName.add(cursor.getString(cursor.getColumnIndex(DBHelper.NAME_COl)))
+            lAge.add(cursor.getString(cursor.getColumnIndex(DBHelper.AGE_COL)))
+            lId.add(cursor.getString(cursor.getColumnIndex(DBHelper.ID_COL)))
+
+
+            while(cursor.moveToNext()){
+                lName.add(cursor.getString(cursor.getColumnIndex(DBHelper.NAME_COl)))
+                lAge.add(cursor.getString(cursor.getColumnIndex(DBHelper.AGE_COL)))
+                lId.add(cursor.getString(cursor.getColumnIndex(DBHelper.ID_COL)))
+
+            }
+
+            cursor.close()
+        } catch (e: Exception){
+            e.printStackTrace()
+        }
     }
+
+    mostrar()
 
     Column (
         verticalArrangement = Arrangement.Center,
@@ -145,7 +176,7 @@ fun MainActivity(modifier: Modifier) {
 
                     nameValue = ""
                     ageValue = ""
-                    mostrar(lId, lName, lName, context)
+                    mostrar()
                 }
             ) {
                 Text(text = "Añadir")
@@ -191,7 +222,7 @@ fun MainActivity(modifier: Modifier) {
                                 mostrarBorrar = false // Ocultar el botón de borrar
                                 mostrarEditar = false // Ocultar el botón de editar
                                 Toast.makeText(context, "Registro eliminado", Toast.LENGTH_SHORT).show()
-                                mostrar(lId, lName, lName, context)
+                                mostrar()
                             }
                         },
                     ) {
@@ -260,7 +291,7 @@ fun MainActivity(modifier: Modifier) {
                                     mostrarDialogo = false
                                     Toast.makeText(context, "Registro actualizado", Toast.LENGTH_SHORT).show()
                                     Log.i("prueba", nameValue)
-                                    mostrar(lId, lName, lName, context)
+                                    mostrar()
                                 }
                             }) {
                                 Text("Actualizar")
@@ -275,38 +306,5 @@ fun MainActivity(modifier: Modifier) {
                 }
             }
         }
-
-
-    }
-    mostrar(lId, lName, lName, context)
-}
-
-@SuppressLint("Range")
-fun mostrar(lId: MutableList<String>, lName: MutableList<String>, lAge: MutableList<String>, context: Context) {
-    try {
-        lId.clear()
-        lName.clear()
-        lAge.clear()
-
-        val db = DBHelper(context, null)
-
-        val cursor = db.getName()
-
-        cursor!!.moveToFirst()
-        lName.add(cursor.getString(cursor.getColumnIndex(DBHelper.NAME_COl)))
-        lAge.add(cursor.getString(cursor.getColumnIndex(DBHelper.AGE_COL)))
-        lId.add(cursor.getString(cursor.getColumnIndex(DBHelper.ID_COL)))
-
-
-        while(cursor.moveToNext()){
-            lName.add(cursor.getString(cursor.getColumnIndex(DBHelper.NAME_COl)))
-            lAge.add(cursor.getString(cursor.getColumnIndex(DBHelper.AGE_COL)))
-            lId.add(cursor.getString(cursor.getColumnIndex(DBHelper.ID_COL)))
-
-        }
-
-        cursor?.close()
-    } catch (e: Exception){
-        e.printStackTrace()
     }
 }
