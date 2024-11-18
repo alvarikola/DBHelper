@@ -24,6 +24,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,7 +66,9 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@SuppressLint("Range")
+
+
+//@SuppressLint("Range")
 @Composable
 fun MainActivity(modifier: Modifier) {
     val context = LocalContext.current
@@ -78,6 +81,9 @@ fun MainActivity(modifier: Modifier) {
     var mostrarEditar by remember { mutableStateOf(false) }
     var mostrarDialogo by remember { mutableStateOf(false) }
 
+    LaunchedEffect(Unit) {
+        mostrar(lId, lName, lName, context)
+    }
 
     Column (
         verticalArrangement = Arrangement.Center,
@@ -272,6 +278,7 @@ fun MainActivity(modifier: Modifier) {
 
 
     }
+    mostrar(lId, lName, lName, context)
 }
 
 @SuppressLint("Range")
